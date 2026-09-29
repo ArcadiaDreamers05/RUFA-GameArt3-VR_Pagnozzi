@@ -1,0 +1,8 @@
+# Two shortcuts for the course, enabled once with: git config include.path ../.gitconfig
+#   git aggiorna   start of the lesson: core, handouts and the demo folder become the course's again
+#   git salva "Lezione 03"   end of the lesson: commit everything and push it to your repository
+# Both commit only when there is something to commit and always push, so after a failed push the next run sends it.
+# git lfs fetch corso: the course's LFS files come from the course even with Git LFS versions without lfs.remote.searchall.
+[alias]
+	aggiorna = "!f() { git fetch corso && git lfs fetch corso corso/main && git restore --source=corso/main --staged --worktree -- sandbox/Packages/com.rufa.core sandbox/Assets/Demo sandbox/Assets/Demo.meta materiali README.md .gitconfig && git clean -fd -- sandbox/Assets/Demo && { git diff --cached --quiet || git commit -qm 'Aggiornamento dal corso'; } && git push -q; }; f"
+	salva = "!f() { git add -A && { git diff --cached --quiet || git commit -qm \"${1:-Fine lezione}\"; } && git push -q; }; f"

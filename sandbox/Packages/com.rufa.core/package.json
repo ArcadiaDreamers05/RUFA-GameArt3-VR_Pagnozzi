@@ -1,0 +1,15 @@
+{
+  "name": "com.rufa.core",
+  "displayName": "RUFA Core",
+  "version": "0.1.0",
+  "unity": "6000.3",
+  "description": "Dual-target runtime and editor tooling for the Game Art 3 course: spawns a VR rig on Meta Quest or a desktop rig on PC, and configures and builds the project from menu items.",
+  "author": {
+    "name": "Gianluca Camarca"
+  },
+  "dependencies": {
+    "com.unity.xr.interaction.toolkit": "3.6.1",
+    "com.unity.xr.openxr": "1.18.0",
+    "com.unity.xr.meta-openxr": "2.6.1"
+  }
+}
