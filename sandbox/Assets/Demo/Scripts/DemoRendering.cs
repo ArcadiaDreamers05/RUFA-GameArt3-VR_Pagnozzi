@@ -39,11 +39,12 @@ namespace Rufa.Demo
 
         // In the editor the switches write into the URP asset, and an asset changed during Play stays changed:
         // put the values back when Play ends. In a build this changes nothing.
-        int msaa; float scale; bool hdr;
-        void Remember() { if (Asset != null) (msaa, scale, hdr) = (Asset.msaaSampleCount, Asset.renderScale, Asset.supportsHDR); }
+        // Into the asset read at Awake: on Stop the scene pipeline may already have made the project's asset current again.
+        UniversalRenderPipelineAsset remembered; int msaa; float scale; bool hdr;
+        void Remember() { remembered = Asset; if (remembered != null) (msaa, scale, hdr) = (remembered.msaaSampleCount, remembered.renderScale, remembered.supportsHDR); }
         void OnDestroy()
         {
-            if (Application.isEditor && Asset != null) (Asset.msaaSampleCount, Asset.renderScale, Asset.supportsHDR) = (msaa, scale, hdr);
+            if (Application.isEditor && remembered != null) (remembered.msaaSampleCount, remembered.renderScale, remembered.supportsHDR) = (msaa, scale, hdr);
         }
     }
 }

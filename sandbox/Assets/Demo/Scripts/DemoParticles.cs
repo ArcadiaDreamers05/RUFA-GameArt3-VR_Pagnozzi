@@ -24,18 +24,20 @@ namespace Rufa.Demo
 
         readonly List<ParticleSystem> systems = new List<ParticleSystem>();
 
+        UniversalRenderPipelineAsset asset;  // the demo's, read at Awake: on Stop the project's may already be current again
         bool depthAtStart;
 
         void Awake()
         {
-            depthAtStart = UniversalRenderPipeline.asset != null && UniversalRenderPipeline.asset.supportsCameraDepthTexture;
+            asset = UniversalRenderPipeline.asset;
+            depthAtStart = asset != null && asset.supportsCameraDepthTexture;
             TeacherMenu.Register("Particellari malati", () => sick, value => { sick = value; Apply(); });
         }
 
         // In the editor Apply writes into the URP asset, and an asset changed during Play stays changed: put it back.
         void OnDestroy()
         {
-            if (Application.isEditor && UniversalRenderPipeline.asset != null) UniversalRenderPipeline.asset.supportsCameraDepthTexture = depthAtStart;
+            if (Application.isEditor && asset != null) asset.supportsCameraDepthTexture = depthAtStart;
         }
 
         void Start()
@@ -86,7 +88,7 @@ namespace Rufa.Demo
                 ps.Play();
             }
             // Soft particles read the depth texture: the sick preset pays for it, the healthy one does not.
-            if (UniversalRenderPipeline.asset != null) UniversalRenderPipeline.asset.supportsCameraDepthTexture = sick;
+            if (asset != null) asset.supportsCameraDepthTexture = sick;
         }
     }
 }

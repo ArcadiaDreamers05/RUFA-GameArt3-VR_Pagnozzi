@@ -21,11 +21,17 @@ namespace Rufa
         double sum;   // GPU milliseconds of the frames since the last adjustment
         int samples;
 
-        void OnEnable() => nextCheck = Time.unscaledTime + interval;
+        UniversalRenderPipelineAsset asset;  // the one it adjusts, read at OnEnable: on Stop another may already be current
+
+        void OnEnable()
+        {
+            asset = UniversalRenderPipeline.asset;
+            nextCheck = Time.unscaledTime + interval;
+        }
 
         void OnDisable()
         {
-            if (UniversalRenderPipeline.asset != null) UniversalRenderPipeline.asset.renderScale = maxScale;
+            if (asset != null) asset.renderScale = maxScale;
         }
 
         void Update()
@@ -44,7 +50,6 @@ namespace Rufa
             double gpu = sum / samples;
             sum = 0; samples = 0;
 
-            var asset = UniversalRenderPipeline.asset;
             if (asset == null) return;
             if (gpu > upperMs) asset.renderScale = Mathf.Max(minScale, asset.renderScale - step);
             else if (gpu < lowerMs) asset.renderScale = Mathf.Min(maxScale, asset.renderScale + step);
