@@ -126,5 +126,18 @@ namespace Rufa
             Cursor.lockState = locked ? CursorLockMode.Locked : CursorLockMode.None;
             Cursor.visible = !locked;
         }
+
+#if UNITY_EDITOR
+        // In the editor, plain Play spawns this rig, not the XR rig prefab: say so for a few seconds,
+        // so nobody tunes the XR rig and wonders why nothing changes. Editor only: OnGUI costs time in a player too.
+        void OnGUI()
+        {
+            if (Time.timeSinceLevelLoad > 6f) return;
+            var box = new Rect(16f, 16f, 780f, 64f);
+            GUI.Box(box, GUIContent.none);
+            GUI.Label(new Rect(box.x + 12f, box.y + 8f, box.width - 24f, box.height - 16f),
+                "<size=18>Modalità PC: il prefab XR Origin non è in uso.\nPer provarlo senza visore: RUFA > Play mode > Simulatore VR</size>");
+        }
+#endif
     }
 }

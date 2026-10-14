@@ -21503,6 +21503,10 @@ PrefabInstance:
       propertyPath: m_AttachTransform
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 4737786028608081108, guid: 3f88ed103c0198344990caaeaccaa0de, type: 3}
+      propertyPath: m_UseDynamicAttach
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 6021888384207307883, guid: 3f88ed103c0198344990caaeaccaa0de, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 

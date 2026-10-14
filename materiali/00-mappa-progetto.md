@@ -58,12 +58,12 @@ Unity chiama gli script in tre fasi: prima `Awake` su tutti gli oggetti, poi `St
 
 | Vuoi cambiare | Dove |
 |---|---|
-| Velocità, rotazione, teleport (lezione 2) | Nel **prefab** `XR Origin (XR Rig)` in `Assets/Samples/…/Starter Assets/Prefabs/`, non sulla copia `(Clone)` che compare in Play. Il demo usa lo stesso rig: le modifiche valgono anche lì |
+| Velocità, rotazione, teleport (lezione 2) | Nel **prefab** del rig che stai usando: nella palestra `XR Origin (sabotato)`, nel tuo progetto `Assets/Progetto/XR Origin (progetto).prefab`; mai sul rig base degli Starter Assets né sulla copia `(Clone)` che compare in Play |
 | Come si impugna un oggetto | Il figlio `Attach` dell'oggetto afferrabile |
 | Cosa succede quando la chiave entra o premi il pulsante | Gli eventi `On Unlocked` e `On Pressed` nell'Inspector |
 | Le cure della dimostrazione | Nella scena del demo, sugli stessi oggetti del docente: lui dice finestra, oggetto, componente, campo e valore |
 | Il demo sul visore | **RUFA ▸ Build ▸ Demo (APK)**: un'app a parte, "RUFA Demo", accanto a "RUFA Sandbox" |
-| Il tuo livello | La scena `Sandbox.unity`, oppure una scena nuova: in quel caso copiaci `Rig Bootstrap` e aggiungila alla **Scene List** di **File ▸ Build Profiles**, perché le build RUFA prendono le scene da lì |
+| Il tuo progetto d'esame | La scena `Assets/Progetto/Progetto.unity`, creata dal tutorial della lezione 2 e già prima nella **Scene List** di **File ▸ Build Profiles**: le build RUFA partono da lì |
 | Impostazioni di progetto, URP, XR | Solo quando una lezione lo chiede (lezioni 8–10) |
 | Il nucleo `com.rufa.core` | Mai |
 

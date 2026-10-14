@@ -5,7 +5,7 @@ Ogni consegna va nel tuo repository, cartella `Consegne/Lxx/`, entro la fine del
 | Lezione | Consegna | Cosa mettere in `Consegne/Lxx/` |
 |---|---|---|
 | 1 | Sandbox installato sul visore e Play in editor | Screenshot del visore (o foto) e della Console pulita |
-| 2 | Locomozione completa con parametri di comfort | Screenshot dell'Inspector dei provider; una riga sui valori scelti |
+| 2 | Locomozione e comfort: verifica a percorso e prima scena del progetto | Nessun file da aggiungere: il lavoro salvato a Unity chiuso con `git salva "Lezione 02"` |
 | 3 | Set di interazioni funzionanti | Video di 30 s (PC o visore) con trigger, grab, socket, porta |
 | 4 | **Pitch e blockout approvato** | Concept (mezza pagina), pianta del livello, screenshot del blockout sul visore |
 | 5 | Report di profiling del blockout | Report (una pagina) + CSV del benchmark "prima" |

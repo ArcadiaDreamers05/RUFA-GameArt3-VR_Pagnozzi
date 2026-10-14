@@ -57,7 +57,7 @@ Da riga di comando (esempio Windows, dalla cartella `sandbox/`):
 ## Materiali del corso
 - `materiali/00-mappa-progetto.md` — come funziona il sandbox: cosa c'è in scena, cosa nasce in Play, dove si cambiano le cose
 - `materiali/01-setup.md` — setup, primo deploy, cosa fare se non va
-- `materiali/02-locomozione.md` — locomozione e comfort
+- `materiali/02-locomozione.md` — locomozione e comfort, con il tutorial in RUFA ▸ Tutorial
 - `materiali/03-interazioni.md` — prefab mattoncino, eventi, problemi comuni
 - `materiali/04-blockout.md` — scala, level design, concept e blockout
 - `materiali/05-profiling.md` — profiling e frame budget
@@ -72,3 +72,7 @@ Da riga di comando (esempio Windows, dalla cartella `sandbox/`):
 - `materiali/14-scheda-playtest.md` — playtest
 - `materiali/15-relazione-template.md` — relazione tecnica d'esame
 - `materiali/checklist-consegne.md` — tutte le consegne
+
+## Licenze
+
+I sample di XR Interaction Toolkit (`sandbox/Assets/Samples/XR Interaction Toolkit`) e le risorse di TextMesh Pro sono di Unity Technologies e sono distribuiti con la [Unity Companion License](https://unity.com/legal/licenses/unity-companion-license).

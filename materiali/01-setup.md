@@ -12,7 +12,7 @@
 ## Il tuo repository
 Il repository del corso è in sola lettura: lavori su una tua copia, sul tuo account GitHub. È anche il posto delle consegne (`Consegne/Lxx/`).
 
-1. Su github.com: **New repository**, un nome (per esempio `rufa-vr-cognome`), **Private**, niente README, .gitignore o licenza, **Create repository**. Copia l'indirizzo che finisce con `.git`.
+1. Su github.com: **New repository**, un nome (per esempio `rufa-vr-cognome`), **Private**, **niente README, .gitignore o licenza** (altrimenti l'ultimo comando del punto 2 va in errore), **Create repository**. Copia l'indirizzo che finisce con `.git`.
 2. Nel terminale, nella cartella dove tieni i progetti. Meglio un percorso corto, per esempio `C:\Users\<nome>`: Unity non regge i percorsi troppo lunghi.
 
        git clone https://github.com/Gianluca-C90/RUFA-GameArt3-VR.git rufa-vr
@@ -67,10 +67,11 @@ Se lavori su due PC, prima di cominciare su uno prendi quello che hai salvato su
 ## Inizio e fine lezione
 Due comandi, dalla cartella della tua copia (`rufa-vr`), sempre con **Unity chiuso**:
 
-- **Inizio lezione:** `git aggiorna`. Prende dal corso il nucleo, le dispense e la cartella del demo (`Assets/Demo`), e li salva sul tuo repository. La cartella del demo torna identica a quella del docente, anche se hai saltato una lezione. Il tuo progetto non lo tocca.
+- **Inizio lezione:** `git aggiorna`. Prende dal corso il nucleo, le dispense, la cartella del demo (`Assets/Demo`) e gli Starter Assets di XR Interaction Toolkit, e li salva sul tuo repository. La cartella del demo torna identica a quella del docente, anche se hai saltato una lezione. Il tuo progetto non lo tocca.
 - **Fine lezione:** in Unity Ctrl+S e **File ▸ Save Project**, poi chiudi Unity e lancia `git salva "Lezione 03"`. Salva tutto, consegna in `Consegne/L03/` compresa, e lo manda sul tuo repository.
 
 Perché gli aggiornamenti non rompano mai niente:
+- gli Starter Assets (`Assets/Samples/XR Interaction Toolkit`) non si modificano: a ogni `git aggiorna` tornano quelli del corso. Quello che vuoi cambiare lo cambi nelle variant, come il tuo `XR Origin (progetto)`;
 - il tuo lavoro va in `Assets/Progetto/` e nelle tue scene. Nella cartella `Assets/Demo` lavori solo durante le dimostrazioni: a ogni `git aggiorna` torna quella del docente, e la tua versione resta nella storia di git;
 - `sandbox/Packages/com.rufa.core/` e `materiali/` non si modificano: li aggiorna il corso. Se li hai toccati per sbaglio, `git aggiorna` li rimette com'erano;
 - il demo usa anche file del tuo progetto, che `git aggiorna` non tocca: i prefab mattoncino di `Assets/RUFA/Prefabs`, il rig `XR Origin (XR Rig)` e le impostazioni URP di `Assets/Settings`. Se li modifichi, cambiano anche nel demo. Per le tue versioni dei mattoncini fai una copia, o una Prefab Variant, in `Assets/Progetto`;
@@ -95,7 +96,7 @@ Il doppio target, cioè lo stesso progetto in VR e su PC, sta nel package `com.r
 | Unity chiede di importare "TMP Essentials" | Accetta: serve per i testi |
 | `git: 'aggiorna' is not a git command` | Manca il collegamento ai comandi del corso: dalla cartella della tua copia `git config include.path ../.gitconfig` |
 | `Author identity unknown` o `Please tell me who you are` | Su questa copia mancano nome ed email: dalla sua cartella `git config user.name "Nome Cognome"` e `git config user.email "la-tua-email@esempio.it"`, poi di nuovo il comando |
-| Il primo `git push -u origin main` risponde `rejected` | Su GitHub il repository è stato creato con un README. Solo questa volta: `git push -u --force origin main` |
+| Il primo `git push -u origin main` risponde `rejected` e `(fetch first)` | Su GitHub il repository è stato creato con un README, cioè con un "Initial commit" che la tua copia non ha. Solo questa volta: `git fetch origin`, poi `git push -u --force-with-lease origin main`. Senza il `fetch` il secondo comando risponde `(stale info)` |
 | `git aggiorna` o `git salva` rispondono `rejected` | Il tuo repository ha lavoro che questa copia non ha, per esempio salvato da un altro PC: `git pull --no-rebase --no-edit`, poi di nuovo il comando |
 | `git salva` ha dato un errore, per esempio di rete | Rilancialo: se il salvataggio c'è già, lo manda soltanto |
 | `git push` risponde 403 o "Permission denied" | Il PC del laboratorio ricorda l'account GitHub di un altro: `git credential-manager github list` per vederlo, `git credential-manager github logout <utente>` per toglierlo, poi di nuovo `git push` |

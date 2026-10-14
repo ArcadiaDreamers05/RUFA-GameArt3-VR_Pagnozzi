@@ -28,7 +28,8 @@ namespace Rufa.Demo
             if (snap != null) { snap.turnAmount = 45f; snap.debounceTime = 0.5f; }
 
             // Each hand decides between smooth and snap turn; sick = smooth and fast.
-            foreach (var hand in FindObjectsByType<ControllerInputActionManager>(FindObjectsSortMode.None))
+            // Inactive ones too: the rig keeps the controllers off until it sees them tracked (with Quest Link, after Start).
+            foreach (var hand in FindObjectsByType<ControllerInputActionManager>(FindObjectsInactive.Include, FindObjectsSortMode.None))
                 hand.smoothTurnEnabled = sick;
         }
     }

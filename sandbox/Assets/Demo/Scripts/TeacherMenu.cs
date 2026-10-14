@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
+using UnityEngine.XR.Interaction.Toolkit.Inputs;
 using UnityEngine.XR.Interaction.Toolkit.UI;
 
 namespace Rufa.Demo
@@ -112,8 +113,11 @@ namespace Rufa.Demo
         {
             if (RigBootstrap.XrIsActive)
             {
-                var wrist = GameObject.Find("Left Controller");
-                if (wrist == null) { Debug.LogWarning("TeacherMenu: 'Left Controller' not found, panel left at the origin."); return; }
+                // Asked to the rig, not found by name: the rig keeps the controllers off until it sees them tracked
+                // (with Quest Link, after Start), and GameObject.Find skips inactive objects. The panel appears with the controller.
+                var rig = FindFirstObjectByType<XRInputModalityManager>();
+                var wrist = rig != null ? rig.leftController : null;
+                if (wrist == null) { Debug.LogWarning("TeacherMenu: no left controller in the XR rig, panel left at the origin."); return; }
                 canvas.transform.SetParent(wrist.transform, false);
                 canvas.transform.localPosition = new Vector3(0f, 0.08f, -0.05f);
                 canvas.transform.localRotation = Quaternion.Euler(60f, 0f, 0f);

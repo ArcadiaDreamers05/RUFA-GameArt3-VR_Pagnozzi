@@ -1,41 +1,74 @@
 # Lezione 2 — Locomozione e comfort con XR Interaction Toolkit
 
-## Cosa c'è già nel rig
-Il progetto istanzia all'avvio il prefab **XR Origin (XR Rig)** degli Starter Assets. Contiene già tutto: apri il prefab (`Assets/Samples/XR Interaction Toolkit/3.6.1/Starter Assets/Prefabs/XR Origin (XR Rig).prefab`, doppio click) e guarda sotto `Locomotion`:
-- `Move` → **Dynamic Move Provider**: movimento continuo con lo stick sinistro. `Move Speed` 2,5 m/s, `Enable Strafe` acceso, `Enable Fly` spento, `Use Gravity` acceso, direzione relativa alla testa (`Head Relative`) o alla mano.
-- `Turn` → **Snap Turn Provider** (`Turn Amount` 45°, `Debounce Time` 0,5 s, `Enable Turn Around` acceso: stick indietro = 180°) e **Continuous Turn Provider** (`Turn Speed` 60°/s), che è spento di default.
-- `Teleportation` → **Teleportation Provider**: riceve le richieste delle aree di teleport.
-- `Gravity`, `Jump` (tasto A), `Grab Move` (spento), `Climb`.
-- Su `Left Controller` e `Right Controller` → **Controller Input Action Manager**: `Smooth Motion Enabled` (a sinistra acceso, a destra spento) e `Smooth Turn Enabled` (spento su entrambi). Sono questi due interruttori a decidere cosa fa ogni stick: stick con movimento continuo, oppure stick con teleport + snap turn.
+## Cosa impari
+Com'è fatto il rig VR di XR Interaction Toolkit 3 (XR Origin, tracking, input dei controller, locomozione) e tutti i modi di far muovere il giocatore: camminare, girare, teletrasportarsi, saltare, arrampicarsi, trascinare il mondo. E come si sceglie una locomozione che non faccia stare male.
 
-## Comandi di default sul Quest
+## Come si parte
+1. Unity chiuso, nella tua cartella del corso: `git aggiorna`. Questa volta lancialo due volte: il secondo giro rimette come in origine anche gli Starter Assets di XR Interaction Toolkit.
+2. Apri il progetto `sandbox/` con Unity Hub.
+3. **RUFA ▸ Tutorial**, poi scegli `Lezione 02 - Locomozione` dal menu in alto a sinistra della finestra.
+4. Premi **Importa la palestra**. Se hai ancora la palestra della volta scorsa, ti chiede di sostituirla: rispondi **Sostituisci** (la copia vecchia va nel Cestino).
+
+Il tutorial ti guida pagina per pagina. Le pagine con **Da fare** vanno avanti solo quando il progetto è a posto. Con **A−** e **A+** cambi la dimensione del testo.
+
+## La giornata
+- **Insieme** (capitoli 0–6): lavori in una palestra con un rig sabotato. Lo provi, lo apri, lo curi; poi progetti il teleport e provi salto, scala a pioli, grab move e vignetta.
+- **Da soli · Verifica**: un percorso a ostacoli dalla A alla B, da superare con quello che hai imparato. I compiti si spuntano da soli mentre lavori, con il punteggio in alto: è un'autovalutazione.
+- **Da soli · Il tuo progetto**: crei la scena del tuo progetto d'esame, in `Assets/Progetto`, configuri il comfort del tuo rig e costruisci il primo tratto esplorabile.
+
+## Due rig
+In Play senza visore parte il **rig desktop** (WASD e mouse), che non usa il prefab XR: se cambi il prefab XR e premi Play, non vedi nessuna differenza. Per provare il rig XR senza visore accendi **RUFA ▸ Play mode ▸ Simulatore VR**; per provarlo nel visore usa **RUFA ▸ Play mode ▸ VR con Quest Link** oppure la build.
+
+## Comandi del simulatore
+
+| Azione | Tasti |
+|---|---|
+| Guardarsi intorno | tasto destro del mouse tenuto, poi il mouse |
+| Camminare (levetta sinistra) | Shift + I J K L; lascia prima la lettera, poi Shift |
+| Girare, teleport (levetta destra) | I J K L |
+| Teleport arrivando girati a sinistra | tieni I, aggiungi J, lascia I e per ultimo J (a destra: L al posto di J) |
+| Grip, grilletto, tasti A e B | G, T, 1, 2 (controller destro); con Shift, il sinistro |
+| Muovere col mouse solo un controller | [ (sinistro), ] (destro); Tab torna a testa e mani insieme |
+| Spostare la testa come camminando nella stanza | W A S D, Q E: la testa attraversa i muri e non cade |
+| Salire la scala a pioli | avvicinati finché un piolo si colora, tieni G e poi lascialo: sei in cima (per salire a mano, tenendo G: ] e Q) |
+| Volare (con Enable Fly acceso) | tasto destro tenuto e mouse per guardare dove vuoi andare, poi Shift + I; se lasci, cadi |
+| Provare il grab move | ] (solo il controller destro), poi G tenuto e insieme A o D; Tab per tornare |
+
+Se il rig cammina da solo, premi di nuovo Shift. Se hai spostato la testa con WASD, esci e rientra in Play.
+
+## Comandi del Quest
+
 | Azione | Comando |
 |---|---|
 | Camminare | Stick sinistro |
-| Snap turn 45° | Stick destro a sinistra/destra |
-| Giro di 180° | Stick destro indietro |
-| Teleport | Stick destro in avanti: compare l'arco, rilascia per saltare (il grip annulla) |
+| Snap turn | Stick destro a sinistra o a destra |
+| Mezzo giro | Stick destro indietro |
+| Teleport | Stick destro in avanti: compare l'arco, rilascia per teletrasportarti (il grip annulla) |
+| Saltare | Tasto A |
+| Arrampicarsi | Grip su un piolo, poi tira verso il basso |
 | Afferrare | Grip |
-| Usare / premere UI | Trigger |
+| Usare, premere la UI | Trigger |
 
-## Il teleport ha bisogno di un'area
-Il rig porta l'interactor di teleport, ma il pavimento deve dirgli "qui si può". Il `Floor` della scena di partenza ce l'ha già: selezionalo e guarda il componente `Teleportation Area` nell'Inspector. Su ogni altro pavimento che costruisci lo aggiungi a mano: `Add Component → Teleportation Area`, `Interaction Layer Mask` = solo **Teleport** (layer 31, nominato da Setup 3). Il campo `Teleportation Provider` può restare vuoto: viene trovato all'avvio.
+## Valori di comfort
 
-## Dove si cambiano i parametri
-Il rig in scena esiste solo durante il Play, quindi le modifiche vanno fatte **sul prefab**, non sull'istanza `(Clone)` nella Hierarchy (quelle si perdono all'uscita dal Play). Modifica il prefab, salva (Ctrl+S in Prefab Mode) e riprova.
+| Parametro | Valore |
+|---|---|
+| Velocità (Move Speed) | 1,5–2,5 m/s |
+| Rotazione | snap turn di 30° o 45°, mai continua |
+| Step Offset | 0,2 m |
+| Teleport | Teleportation Area solo dove si sta in piedi, layer Teleport |
+| Vignetta | `TunnelingVignette` sotto la camera, su Move e Turn |
 
-## Parametri di comfort: cosa scegliere e perché
-Il malessere nasce quando gli occhi vedono un movimento che il corpo non sente. Regole che funzionano:
-- **Teleport** come modo principale di spostarsi: niente accelerazione, niente nausea. Obbligatorio nell'escape room, dove ci si sposta poco.
-- **Movimento continuo** solo se il genere lo richiede (walking simulator): `Move Speed` tra 1,5 e 2,5 m/s, mai di più, `Enable Fly` spento, direzione `Head Relative`.
-- **Snap turn** 30° o 45°, mai la rotazione continua: `Smooth Turn Enabled` resta spento.
-- **Frame rate stabile**: sotto i 90 Hz ogni movimento peggiora (da lezione 5 in poi).
-- **Vignetta** durante movimento e rotazione: arriva alla lezione 12 con `RUFA ▸ Setup ▸ 6`.
-- Nella versione PC la velocità è fissa (3 m/s, mouse per guardare) e non fa parte della consegna.
+## Problemi frequenti
 
-## Provare
-- Sul visore: **RUFA ▸ Build ▸ Quest (APK)** e `adb install -r`.
-- Senza rifare la build: **RUFA ▸ Play mode ▸ VR con Quest Link** (spunta) e **Play**, con l'app Meta Quest Link attiva sul PC e il runtime OpenXR impostato su Meta. Togli la spunta quando hai finito, altrimenti il Play normale prova a inizializzare OpenXR.
+| Sintomo | Causa | Rimedio |
+|---|---|---|
+| Attraversi i muri e non cadi | ti muovi con WASD, che sposta la testa | cammina con Shift + I J K L |
+| Cambio il prefab XR ma in Play non cambia niente | sta girando il rig desktop | **RUFA ▸ Play mode ▸ Simulatore VR** |
+| I valori tornano come prima | li hai cambiati in Play, sulla copia `(Clone)` | cambiali in Prefab Mode e salva |
+| Il teleport non parte su una superficie | manca la Teleportation Area, o non è sul layer Teleport | Add Component ▸ Teleportation Area, Interaction Layer Mask = Teleport |
+| Sull'anchor arrivo girato male | la freccia blu dell'anchor, l'asse Z, non punta verso la stazione | ruota l'anchor finché la freccia blu non guarda la stazione |
+| Il tasto del salto non fa niente | Jump Input senza azione | `XRI Right Locomotion/Jump` nei due campi di Jump Input |
 
 ## Consegna
-In `Consegne/L02/`: gli screenshot dell'Inspector di `Move`, `Turn` e dei due `Controller Input Action Manager` con i valori scelti, e una riga che spiega la scelta in base al tuo genere. Il sandbox deve essere esplorabile sul visore con teleport, snap turn e, se lo usi, movimento continuo.
+Il lavoro, salvato a Unity chiuso con `git salva "Lezione 02"`.
