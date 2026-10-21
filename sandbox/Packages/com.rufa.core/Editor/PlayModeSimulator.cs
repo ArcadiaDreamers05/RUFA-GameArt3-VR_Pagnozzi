@@ -42,12 +42,11 @@ namespace Rufa.Editor
             KeepOutOfGit(Path.GetFullPath(Path.Combine(Application.dataPath, "..", "..")));
             if (AssetDatabase.LoadAssetAtPath<GameObject>(RigBootstrap.SimulatorPrefabPath) != null) return true;
             var sample = Sample.FindByPackage("com.unity.xr.interaction.toolkit", "3.6.1").FirstOrDefault(s => s.displayName == "XR Interaction Simulator");
-            if (sample.displayName == null || !sample.Import(Sample.ImportOptions.HideImportWindow))
+            if (!SampleImport.Copy(sample))
             {
                 Debug.LogError("RUFA: could not import the 'XR Interaction Simulator' sample of XR Interaction Toolkit 3.6.1.");
                 return false;
             }
-            AssetDatabase.Refresh();
             return true;
         }
 
@@ -55,6 +54,10 @@ namespace Rufa.Editor
         {
             "/sandbox/Assets/Samples/XR Interaction Toolkit/*/XR Interaction Simulator/",
             "/sandbox/Assets/Samples/XR Interaction Toolkit/*/XR Interaction Simulator.meta",
+            "/sandbox/Assets/Samples/XR Hands/",   // the hands of lesson 3: the tutorial imports them
+            "/sandbox/Assets/Samples/XR Hands.meta",
+            "/sandbox/Assets/Samples/XR Interaction Toolkit/*/Hands Interaction Demo/",
+            "/sandbox/Assets/Samples/XR Interaction Toolkit/*/Hands Interaction Demo.meta",
         };
 
         // The course's .gitignore lists the sample too, but "git aggiorna" does not bring a new .gitignore to copies cloned

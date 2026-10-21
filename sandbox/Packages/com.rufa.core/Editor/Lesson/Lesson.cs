@@ -15,12 +15,13 @@ namespace Rufa.Editor
         public string[] checkArgs = Array.Empty<string>();
         public string action, actionLabel;              // "> azione: Button text | id | arg": a button that runs an entry of LessonChecks
         public string[] actionArgs = Array.Empty<string>();
+        public List<string> solution = new List<string>(); // "> soluzione: step", one line per step: shown on request in a "Da soli" list
     }
 
     /// <summary>
     /// Reads a lesson tutorial from its markdown file. "# " starts a chapter ("# Da soli ..." = a list of tasks to do alone, in any order;
     /// a task titled "Extra..." is a bonus, out of the score), "## " a page, plain lines are the page text. Lines starting with "> " are directives: evidenzia, verifica and azione drive the
-    /// editor; attesa and lavoro feed only the time estimate (tools/stima-tempi.py). Lines before the first page are
+    /// editor, soluzione adds a step to the solution of a task done alone; attesa and lavoro feed only the time estimate (tools/stima-tempi.py). Lines before the first page are
     /// notes for whoever edits the file.
     /// </summary>
     public static class Lesson
@@ -57,6 +58,7 @@ namespace Rufa.Editor
                     page.check = space < 0 ? v : v.Substring(0, space);
                     page.checkArgs = space < 0 ? Array.Empty<string>() : Parts(v.Substring(space + 1));
                 }
+                else if (line.StartsWith("> soluzione:")) page.solution.Add(Value(line));
                 else page.body += line + "\n";
             }
             foreach (var p in pages) p.body = p.body.Trim();

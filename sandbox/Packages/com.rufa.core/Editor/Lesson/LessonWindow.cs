@@ -24,6 +24,7 @@ namespace Rufa.Editor
         [SerializeField] int index;
         [SerializeField] List<int> done = new List<int>();      // pages done, and list tasks done in Play: for good
         [SerializeField] List<int> verified = new List<int>();  // list tasks that do not need Play and passed at the last check of their chapter
+        [SerializeField] List<int> helped = new List<int>();    // list tasks whose solution was shown: they still count, marked
         [SerializeField] int fontSize = 16;
 
         List<LessonPage> pages;
@@ -41,6 +42,7 @@ namespace Rufa.Editor
             window.lessonPath = path;
             window.done.Clear();
             window.verified.Clear();
+            window.helped.Clear();
             window.pages = Load(path);
             window.pageCount = window.pages == null ? 0 : window.pages.Count;
             if (window.pages != null && window.pages.Count > 0) window.GoTo(0);
@@ -50,7 +52,7 @@ namespace Rufa.Editor
         {
             pages = Load(lessonPath);
             // The lesson changed since the window saved its progress: the pages would not match.
-            if (pages != null && pages.Count != pageCount) { done.Clear(); verified.Clear(); index = 0; pageCount = pages.Count; }
+            if (pages != null && pages.Count != pageCount) { done.Clear(); verified.Clear(); helped.Clear(); index = 0; pageCount = pages.Count; }
             EditorApplication.update += Tick;
         }
 
@@ -117,8 +119,10 @@ namespace Rufa.Editor
             // A task whose title starts with "Extra" is a bonus: out of the total, shown in the score once done.
             var scored = tasks.Where(i => pages[i].check != null && !pages[i].title.StartsWith("Extra")).ToList();
             var extra = tasks.Count(i => pages[i].check != null && pages[i].title.StartsWith("Extra") && Passed(i));
+            // Every solution opened counts, done or not: the teacher sees at a glance how much help was asked for
+            var peeked = tasks.Any(i => pages[i].solution.Count > 0) ? $"   Soluzioni guardate: {tasks.Count(helped.Contains)}" : "";
             if (scored.Count > 0)
-                GUILayout.Label($"<b>{scored.Count(Passed)} / {scored.Count}</b>" + (extra > 0 ? $"  <b>+{extra} extra</b>" : ""),
+                GUILayout.Label($"<b>{scored.Count(Passed)} / {scored.Count}</b>" + (extra > 0 ? $"  <b>+{extra} extra</b>" : "") + peeked,
                     new GUIStyle(text) { fontSize = fontSize + 4 });
             scroll = EditorGUILayout.BeginScrollView(scroll);
             foreach (var i in tasks)
@@ -129,6 +133,9 @@ namespace Rufa.Editor
                 using (new EditorGUI.DisabledScope(EditorApplication.isPlaying))
                     if (page.action != null && GUILayout.Button(page.actionLabel, GUILayout.Height(fontSize * 2f)))
                         LessonChecks.Run(page.action, page.actionArgs);
+                if (page.solution.Count > 0 && !helped.Contains(i) && GUILayout.Button("Mostra la soluzione", GUILayout.Height(fontSize * 2f)))
+                    helped.Add(i);
+                if (helped.Contains(i)) GUILayout.Label(Rich(string.Join("\n", page.solution.Select((step, n) => $"{n + 1}. {step}"))), text);
                 if (page.check != null) GUILayout.Label(Status(i), text);
                 GUILayout.Space(fontSize);
             }
@@ -145,7 +152,7 @@ namespace Rufa.Editor
         bool Passed(int i) => LessonChecks.PlayOnly.Contains(pages[i].check) ? done.Contains(i) : verified.Contains(i);
 
         string Status(int i) =>
-            Passed(i) ? "<color=#4caf50><b>✓ Fatto</b></color>"
+            Passed(i) ? (helped.Contains(i) ? "<color=#4caf50><b>✓ Fatto, con la soluzione</b></color>" : "<color=#4caf50><b>✓ Fatto</b></color>")
             : LessonChecks.PlayOnly.Contains(pages[i].check) ? "<color=#ffb300><b>Da fare in Play</b></color>"
             : "<color=#e57373><b>✗ Non ancora</b></color>";
 

@@ -74,7 +74,7 @@ Perché gli aggiornamenti non rompano mai niente:
 - gli Starter Assets (`Assets/Samples/XR Interaction Toolkit`) non si modificano: a ogni `git aggiorna` tornano quelli del corso. Quello che vuoi cambiare lo cambi nelle variant, come il tuo `XR Origin (progetto)`;
 - il tuo lavoro va in `Assets/Progetto/` e nelle tue scene. Nella cartella `Assets/Demo` lavori solo durante le dimostrazioni: a ogni `git aggiorna` torna quella del docente, e la tua versione resta nella storia di git;
 - `sandbox/Packages/com.rufa.core/` e `materiali/` non si modificano: li aggiorna il corso. Se li hai toccati per sbaglio, `git aggiorna` li rimette com'erano;
-- il demo usa anche file del tuo progetto, che `git aggiorna` non tocca: i prefab mattoncino di `Assets/RUFA/Prefabs`, il rig `XR Origin (XR Rig)` e le impostazioni URP di `Assets/Settings`. Se li modifichi, cambiano anche nel demo. Per le tue versioni dei mattoncini fai una copia, o una Prefab Variant, in `Assets/Progetto`;
+- il demo usa anche file del tuo progetto, che `git aggiorna` non tocca: i prefab mattoncino di `Assets/RUFA/Prefabs` e le impostazioni URP di `Assets/Settings`. Se li modifichi, cambiano anche nel demo. Per le tue versioni dei mattoncini fai una copia, o una Prefab Variant, in `Assets/Progetto`;
 - per usare nel tuo progetto un modello del demo, duplicalo (Ctrl+D) e sposta la copia in `Assets/Progetto`. Se sposti l'originale, `git aggiorna` lo rimette al suo posto e Unity si ritrova due file con lo stesso GUID;
 - non salvare scene o file tuoi dentro `Assets/Demo`: `git aggiorna` li cancella, e lo scrive (`Removing …`).
 

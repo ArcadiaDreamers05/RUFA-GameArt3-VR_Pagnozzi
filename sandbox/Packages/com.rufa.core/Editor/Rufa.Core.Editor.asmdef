@@ -10,6 +10,8 @@
     "Unity.XR.OpenXR.Editor",
     "Unity.XR.OpenXR.Features.MetaQuestSupport",
     "Unity.XR.MetaOpenXR",
+    "Unity.XR.Hands",
+    "Unity.XR.CoreUtils",
     "Unity.RenderPipelines.Universal.Runtime",
     "UnityEngine.UI",
     "Unity.TextMeshPro"

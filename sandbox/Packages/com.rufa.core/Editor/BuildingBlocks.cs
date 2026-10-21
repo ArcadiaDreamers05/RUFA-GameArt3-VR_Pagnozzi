@@ -1,6 +1,7 @@
 using System.Linq;
 using TMPro;
 using UnityEditor;
+using UnityEditor.Events;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
@@ -33,9 +34,16 @@ namespace Rufa.Editor
             Save(Trigger());
             Save(Panel());
             Save(SpatialAudio());
+            Save(Lever());
+            Save(Chest());
+            Save(Crank());
+            Save(Knob());
+            Save(Slider());
+            Save(Switch());
+            Save(Keypad());
 
             AssetDatabase.SaveAssets();
-            Debug.Log($"RUFA: 8 prefabs written to {Folder}.");
+            Debug.Log($"RUFA: 15 prefabs written to {Folder}.");
         }
 
         public static GameObject Load(string prefabName) =>
@@ -148,6 +156,8 @@ namespace Rufa.Editor
             var (color, metallic, smoothness) = name switch
             {
                 "Ottone" => (new Color(0.78f, 0.6f, 0.28f), 0.9f, 0.6f),
+                "Grigio" => (new Color(0.55f, 0.55f, 0.55f), 0f, 0.2f),
+                "Rosso" => (new Color(0.8f, 0.2f, 0.15f), 0f, 0.4f),
                 _ => (new Color(0.42f, 0.27f, 0.16f), 0f, 0.3f), // Legno
             };
             material = new Material(Shader.Find("Universal Render Pipeline/Lit")) { color = color };
@@ -217,6 +227,242 @@ namespace Rufa.Editor
             source.playOnAwake = true;
             source.dopplerLevel = 0f;
             return go;
+        }
+
+        // A primitive inside parent at a local position and scale, painted; some are only to see, without a collider.
+        static GameObject Part(Transform parent, string name, PrimitiveType type, Vector3 position, Vector3 scale, string paint, bool solid = true)
+        {
+            var part = GameObject.CreatePrimitive(type);
+            part.name = name;
+            part.transform.SetParent(parent, false);
+            part.transform.localPosition = position;
+            part.transform.localScale = scale;
+            part.GetComponent<Renderer>().sharedMaterial = Paint(paint);
+            if (!solid) Object.DestroyImmediate(part.GetComponent<Collider>());
+            return part;
+        }
+
+        // A flat cylinder facing -Z. The capsule of a cylinder primitive this flat would be a ball as wide as the disc:
+        // a convex mesh collider keeps its shape.
+        static GameObject Disc(Transform parent, string name, Vector3 position, float diameter, float thickness, string paint)
+        {
+            var disc = Part(parent, name, PrimitiveType.Cylinder, position, new Vector3(diameter, thickness / 2f, diameter), paint, false);
+            disc.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+            disc.AddComponent<MeshCollider>().convex = true;
+            return disc;
+        }
+
+        static Transform Point(Transform parent, string name, Vector3 position)
+        {
+            var point = new GameObject(name).transform;
+            point.SetParent(parent, false);
+            point.localPosition = position;
+            return point;
+        }
+
+        // The hand moves the part with physics, so its joint keeps it on its way; the joint turns it, not the wrist. Let
+        // go, it stays where it is.
+        static void TakenByHand(GameObject part, Transform attach)
+        {
+            var grab = part.AddComponent<XRGrabInteractable>();
+            grab.movementType = XRBaseInteractable.MovementType.VelocityTracking;
+            grab.trackRotation = false;
+            grab.throwOnDetach = false;
+            grab.attachTransform = attach;
+        }
+
+        // Velocity Tracking moves the centre of mass of the body. A wheel has it on its axle, where the hinge holds it
+        // still, and the hand would not turn it: on the handle, the pull of the hand turns the wheel round its hinge.
+        static void DrivenBy(Rigidbody body, Vector3 handle)
+        {
+            body.automaticCenterOfMass = false;
+            body.centerOfMass = handle;
+        }
+
+        // A lever on a post 1 m high: the arm turns on a hinge across X from -45° to 45°, and pulled with its top towards
+        // -Z past 35° it fires On Pulled. No gravity: it stays where the hand leaves it. The limits act 10° before the
+        // stop, or a hard pull would swing it past.
+        static GameObject Lever()
+        {
+            var root = new GameObject("Leva").transform;
+            Part(root, "Base", PrimitiveType.Cube, new Vector3(0f, 0.5f, 0f), new Vector3(0.3f, 1f, 0.3f), "Grigio");
+            Part(root, "Cardine", PrimitiveType.Cylinder, new Vector3(0f, 1.03f, 0f), new Vector3(0.06f, 0.1f, 0.06f), "Ottone", false)
+                .transform.localRotation = Quaternion.Euler(0f, 0f, 90f);
+            var arm = new GameObject("Braccio", typeof(Lever)).transform;   // its hinge and body come with it
+            arm.SetParent(root, false);
+            arm.localPosition = new Vector3(0f, 1.03f, 0f);
+            arm.GetComponent<Rigidbody>().useGravity = false;
+            var hinge = arm.GetComponent<HingeJoint>();
+            hinge.axis = Vector3.left;
+            hinge.useLimits = true;
+            hinge.limits = new JointLimits { min = -45f, max = 45f, contactDistance = 10f };
+            Part(arm, "Asta", PrimitiveType.Cylinder, new Vector3(0f, 0.155f, 0f), new Vector3(0.05f, 0.125f, 0.05f), "Grigio");
+            Part(arm, "Pomello", PrimitiveType.Sphere, new Vector3(0f, 0.28f, 0f), Vector3.one * 0.07f, "Rosso");
+            TakenByHand(arm.gameObject, Point(arm, "Attach", new Vector3(0f, 0.28f, 0f)));
+            return root.gameObject;
+        }
+
+        // A chest open at the front (-Z) with a drawer that runs 35 cm out on a Configurable Joint tied to the chest: X and
+        // Y locked, Z limited to 17.5 cm either side of the middle of the run, no rotation, the limit acting 5 cm before the
+        // stop. The chest is a kinematic body, so the joint's anchor lives in its space and the block can stand anywhere.
+        static GameObject Chest()
+        {
+            var chest = new GameObject("Mobile");
+            chest.AddComponent<Rigidbody>().isKinematic = true;
+            foreach (var (board, position, size) in new[] { ("Fianco ovest", new Vector3(-0.385f, 0.4f, 0f), new Vector3(0.03f, 0.8f, 0.5f)),
+                                                            ("Fianco est", new Vector3(0.385f, 0.4f, 0f), new Vector3(0.03f, 0.8f, 0.5f)),
+                                                            ("Cielo", new Vector3(0f, 0.785f, 0f), new Vector3(0.8f, 0.03f, 0.5f)),
+                                                            ("Fondo", new Vector3(0f, 0.535f, 0f), new Vector3(0.74f, 0.03f, 0.5f)),
+                                                            ("Schiena", new Vector3(0f, 0.4f, 0.24f), new Vector3(0.74f, 0.8f, 0.02f)) })
+                Part(chest.transform, board, PrimitiveType.Cube, position, size, "Legno");
+            var tray = new GameObject("Cassetto").transform;
+            tray.SetParent(chest.transform, false);
+            tray.localPosition = new Vector3(0f, 0.66f, -0.025f);   // closed, its front flush with the chest
+            foreach (var (board, position, size) in new[] { ("Cassetto - fondo", new Vector3(0f, -0.09f, 0f), new Vector3(0.7f, 0.02f, 0.45f)),
+                                                            ("Cassetto - frontale", new Vector3(0f, 0f, -0.215f), new Vector3(0.7f, 0.2f, 0.02f)),
+                                                            ("Cassetto - retro", new Vector3(0f, 0f, 0.215f), new Vector3(0.7f, 0.2f, 0.02f)),
+                                                            ("Cassetto - fianco ovest", new Vector3(-0.34f, 0f, 0f), new Vector3(0.02f, 0.2f, 0.41f)),
+                                                            ("Cassetto - fianco est", new Vector3(0.34f, 0f, 0f), new Vector3(0.02f, 0.2f, 0.41f)) })
+                Part(tray, board, PrimitiveType.Cube, position, size, "Legno");
+            Part(tray, "Maniglia del cassetto", PrimitiveType.Cube, new Vector3(0f, 0.02f, -0.24f), new Vector3(0.14f, 0.03f, 0.03f), "Ottone");
+            tray.gameObject.AddComponent<Rigidbody>().linearDamping = 2f;
+            var joint = tray.gameObject.AddComponent<ConfigurableJoint>();
+            joint.connectedBody = chest.GetComponent<Rigidbody>();
+            joint.xMotion = joint.yMotion = ConfigurableJointMotion.Locked;
+            joint.zMotion = ConfigurableJointMotion.Limited;
+            joint.angularXMotion = joint.angularYMotion = joint.angularZMotion = ConfigurableJointMotion.Locked;
+            joint.linearLimit = new SoftJointLimit { limit = 0.175f, contactDistance = 0.05f };
+            joint.autoConfigureConnectedAnchor = false;
+            joint.connectedAnchor = tray.localPosition + Vector3.back * 0.175f;
+            tray.gameObject.AddComponent<Slide>();
+            TakenByHand(tray.gameObject, Point(tray, "Attach", new Vector3(0f, 0.02f, -0.24f)));
+            return chest;
+        }
+
+        // A wheel 30 cm across on a post, facing -Z, with a handle 12 cm off its centre: a hinge on its axis with no
+        // limits, so it turns round and round. Its axis points at whoever faces it: turned clockwise, the turns
+        // count up.
+        static GameObject Crank()
+        {
+            var root = new GameObject("Manovella").transform;
+            Part(root, "Supporto", PrimitiveType.Cube, new Vector3(0f, 0.55f, 0f), new Vector3(0.1f, 1.1f, 0.1f), "Grigio");
+            var wheel = new GameObject("Ruota", typeof(Crank)).transform;
+            wheel.SetParent(root, false);
+            wheel.localPosition = new Vector3(0f, 1f, -0.07f);   // a centimetre off the post: rubbing on it would brake the wheel
+            var body = wheel.GetComponent<Rigidbody>();
+            body.useGravity = false;
+            body.angularDamping = 1f;   // let go, it slows down
+            wheel.GetComponent<HingeJoint>().axis = Vector3.back;
+            Disc(wheel, "Disco", Vector3.zero, 0.3f, 0.02f, "Legno");
+            Part(wheel, "Maniglia", PrimitiveType.Cylinder, new Vector3(0.12f, 0f, -0.05f), new Vector3(0.03f, 0.04f, 0.03f), "Rosso")
+                .transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+            TakenByHand(wheel.gameObject, Point(wheel, "Attach", new Vector3(0.12f, 0f, -0.05f)));
+            DrivenBy(body, new Vector3(0.12f, 0f, -0.05f));
+            return root.gameObject;
+        }
+
+        // A knob 10 cm across on a plate facing -Z: a hinge from 0° to 170°; the hand takes the notch on its rim and moves
+        // it round, clockwise from 0 like the knob of a stove.
+        static GameObject Knob()
+        {
+            var root = new GameObject("Manopola").transform;
+            Part(root, "Placca", PrimitiveType.Cube, Vector3.zero, new Vector3(0.15f, 0.15f, 0.02f), "Grigio");
+            var disc = new GameObject("Disco", typeof(Knob)).transform;
+            disc.SetParent(root, false);
+            disc.localPosition = new Vector3(0f, 0f, -0.03f);
+            var body = disc.GetComponent<Rigidbody>();
+            body.useGravity = false;
+            body.angularDamping = 5f;
+            var hinge = disc.GetComponent<HingeJoint>();
+            hinge.axis = Vector3.back;
+            hinge.useLimits = true;
+            hinge.limits = new JointLimits { min = 0f, max = 170f, contactDistance = 10f };
+            Disc(disc, "Corpo", Vector3.zero, 0.1f, 0.03f, "Legno");
+            Part(disc, "Tacca", PrimitiveType.Cube, new Vector3(0f, 0.035f, -0.02f), new Vector3(0.015f, 0.03f, 0.015f), "Rosso");
+            TakenByHand(disc.gameObject, Point(disc, "Attach", new Vector3(0f, 0.035f, -0.02f)));
+            DrivenBy(body, new Vector3(0f, 0.035f, -0.02f));
+            return root.gameObject;
+        }
+
+        // A track 50 cm long facing -Z, a kinematic body like the chest, and a cursor that runs along it on a Configurable
+        // Joint: only X, limited to 22 cm either side of the middle, starting at the left end.
+        static GameObject Slider()
+        {
+            var track = new GameObject("Slider");
+            track.AddComponent<Rigidbody>().isKinematic = true;
+            Part(track.transform, "Guida", PrimitiveType.Cube, Vector3.zero, new Vector3(0.5f, 0.03f, 0.05f), "Grigio");
+            var cursor = Part(track.transform, "Cursore", PrimitiveType.Cube, new Vector3(-0.22f, 0f, -0.055f), Vector3.one * 0.06f, "Rosso");
+            var body = cursor.AddComponent<Rigidbody>();
+            body.useGravity = false;
+            body.linearDamping = 5f;
+            var joint = cursor.AddComponent<ConfigurableJoint>();
+            joint.anchor = Vector3.zero;   // on a cube, a new joint starts on the top face
+            joint.connectedBody = track.GetComponent<Rigidbody>();
+            joint.xMotion = ConfigurableJointMotion.Limited;
+            joint.yMotion = joint.zMotion = ConfigurableJointMotion.Locked;
+            joint.angularXMotion = joint.angularYMotion = joint.angularZMotion = ConfigurableJointMotion.Locked;
+            joint.linearLimit = new SoftJointLimit { limit = 0.22f, contactDistance = 0.05f };
+            joint.autoConfigureConnectedAnchor = false;
+            joint.connectedAnchor = new Vector3(0f, 0f, -0.055f);   // the middle of the track, in its space
+            cursor.AddComponent<Slide>();
+            TakenByHand(cursor, Point(cursor.transform, "Attach", Vector3.zero));
+            return track;
+        }
+
+        // A switch plate facing -Z with a small handle that tips up and down at each selection.
+        static GameObject Switch()
+        {
+            var root = new GameObject("Interruttore");
+            root.AddComponent<BoxCollider>().size = new Vector3(0.08f, 0.12f, 0.03f);
+            Part(root.transform, "Placca", PrimitiveType.Cube, Vector3.zero, new Vector3(0.08f, 0.12f, 0.02f), "Grigio", false);
+            var handle = Point(root.transform, "Levetta", new Vector3(0f, 0f, -0.01f));
+            Part(handle, "Asta", PrimitiveType.Cylinder, new Vector3(0f, 0f, -0.02f), new Vector3(0.015f, 0.02f, 0.015f), "Rosso", false)
+                .transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+            root.AddComponent<ToggleSwitch>().handle = handle;   // its interactable comes with it
+            return root;
+        }
+
+        // A keypad 36 x 52 cm in World Space: digits 0-9 and a display. The code is 1234. Two raycasters: the Tracked
+        // Device one for the XR rays, the Graphic one for the mouse, in the PC version and in the simulator.
+        static GameObject Keypad()
+        {
+            var go = new GameObject("Tastierino", typeof(Canvas), typeof(TrackedDeviceGraphicRaycaster), typeof(GraphicRaycaster));
+            go.GetComponent<Canvas>().renderMode = RenderMode.WorldSpace;
+            go.GetComponent<RectTransform>().sizeDelta = new Vector2(360f, 520f);
+            go.transform.localScale = Vector3.one * 0.001f;
+            var background = new GameObject("Sfondo", typeof(Image));
+            background.transform.SetParent(go.transform, false);
+            Stretch(background.GetComponent<RectTransform>());
+            background.GetComponent<Image>().color = new Color(0.1f, 0.1f, 0.12f, 0.9f);
+            var keypad = go.AddComponent<Keypad>();
+            keypad.code = "1234";
+            keypad.display = Label(go.transform, "Display", "", new Vector2(0f, 200f), new Vector2(320f, 80f), 60f);
+            for (var n = 0; n <= 9; n++)
+            {
+                var key = new GameObject("Tasto " + n, typeof(Image), typeof(Button));
+                key.transform.SetParent(go.transform, false);
+                var rect = key.GetComponent<RectTransform>();
+                rect.sizeDelta = new Vector2(90f, 70f);
+                rect.anchoredPosition = n == 0 ? new Vector2(0f, -165f) : new Vector2((n - 1) % 3 * 110f - 110f, 90f - (n - 1) / 3 * 85f);   // 1 2 3, 4 5 6, 7 8 9, 0
+                var button = key.GetComponent<Button>();
+                button.targetGraphic = key.GetComponent<Image>();
+                Label(key.transform, "Etichetta", n.ToString(), Vector2.zero, new Vector2(90f, 70f), 40f).color = Color.black;
+                UnityEventTools.AddStringPersistentListener(button.onClick, keypad.Press, n.ToString());
+            }
+            return go;
+        }
+
+        static TextMeshProUGUI Label(Transform parent, string name, string text, Vector2 position, Vector2 size, float fontSize)
+        {
+            var label = new GameObject(name, typeof(TextMeshProUGUI)).GetComponent<TextMeshProUGUI>();
+            label.transform.SetParent(parent, false);
+            label.rectTransform.anchoredPosition = position;
+            label.rectTransform.sizeDelta = size;
+            label.text = text;
+            label.fontSize = fontSize;
+            label.alignment = TextAlignmentOptions.Center;
+            label.color = Color.white;
+            return label;
         }
 
         static void Stretch(RectTransform rect, float margin = 0f)

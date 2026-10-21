@@ -19,13 +19,13 @@ namespace Rufa
         public bool once = true;
         public UnityEvent onEntered = new UnityEvent();
 
-        bool fired;
+        public bool Fired { get; private set; }
 
         void OnTriggerEnter(Collider other)
         {
-            if (once && fired) return;
+            if (once && Fired) return;
             if (other.GetComponent<CharacterController>() == null) return;
-            fired = true;
+            Fired = true;
             if (audioSource != null && audioSource.clip != null) audioSource.Play();
             if (panel != null)
             {

@@ -1,7 +1,7 @@
 {
   "name": "com.rufa.core",
   "displayName": "RUFA Core",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "unity": "6000.3",
   "description": "Dual-target runtime and editor tooling for the Game Art 3 course: spawns a VR rig on Meta Quest or a desktop rig on PC, and configures and builds the project from menu items.",
   "author": {
@@ -10,13 +10,19 @@
   "dependencies": {
     "com.unity.xr.interaction.toolkit": "3.6.1",
     "com.unity.xr.openxr": "1.18.0",
-    "com.unity.xr.meta-openxr": "2.6.1"
+    "com.unity.xr.meta-openxr": "2.6.1",
+    "com.unity.xr.hands": "1.8.1"
   },
   "samples": [
     {
       "displayName": "Lezione 02 - Locomozione",
       "description": "Palestra della lezione 2: il Percorso con il rig sabotato da curare, la scala a pioli e la verifica a percorso.",
       "path": "Samples~/Lezione 02 - Locomozione"
+    },
+    {
+      "displayName": "Lezione 03 - Interazioni",
+      "description": "Palestra della lezione 3: la Sala delle interazioni da curare e la fuga a stanze.",
+      "path": "Samples~/Lezione 03 - Interazioni"
     }
   ]
 }

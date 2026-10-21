@@ -6,7 +6,7 @@ Ogni consegna va nel tuo repository, cartella `Consegne/Lxx/`, entro la fine del
 |---|---|---|
 | 1 | Sandbox installato sul visore e Play in editor | Screenshot del visore (o foto) e della Console pulita |
 | 2 | Locomozione e comfort: verifica a percorso e prima scena del progetto | Nessun file da aggiungere: il lavoro salvato a Unity chiuso con `git salva "Lezione 02"` |
-| 3 | Set di interazioni funzionanti | Video di 30 s (PC o visore) con trigger, grab, socket, porta |
+| 3 | Set di interazioni funzionanti: verifica a stanze e prime interazioni nel progetto | Nessun file da aggiungere: il lavoro salvato a Unity chiuso con `git salva "Lezione 03"` |
 | 4 | **Pitch e blockout approvato** | Concept (mezza pagina), pianta del livello, screenshot del blockout sul visore |
 | 5 | Report di profiling del blockout | Report (una pagina) + CSV del benchmark "prima" |
 | 6 | Asset con LOD e culling | Screenshot dei LODGroup e dell'occlusion; misura prima/dopo |

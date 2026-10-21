@@ -129,7 +129,7 @@ namespace Rufa.Editor
             EditorUtility.SetDirty(openXr);
         }
 
-        static void Enable<T>(OpenXRSettings settings) where T : OpenXRFeature
+        internal static void Enable<T>(OpenXRSettings settings) where T : OpenXRFeature
         {
             var feature = settings.GetFeature<T>();
             if (feature == null)

@@ -2,7 +2,9 @@ using System.Linq;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEditor.Build.Reporting;
+using UnityEditor.SceneManagement;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Rufa.Editor
 {
@@ -28,6 +30,15 @@ namespace Rufa.Editor
 
         [MenuItem("RUFA/Build/Demo (APK)")]
         public static void BuildDemoQuest() => ExitIfBatch(BuildQuestScene("RUFA Demo", "it.rufa.gameart3.demo", DemoScene));
+
+        // To try on the headset a scene that is not the project's, such as the practice of a lesson: one app for any of
+        // them, so a new one replaces the last. The build reads the scene from disk: unsaved changes would be left out.
+        [MenuItem("RUFA/Build/Scena aperta (APK)")]
+        public static void BuildOpenScene()
+        {
+            if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo())
+                BuildQuestScene("RUFA Scena", "it.rufa.gameart3.scena", SceneManager.GetActiveScene().path);
+        }
 
         /// <summary>One scene as its own app: its own name and package, so it installs next to the project's build.</summary>
         public static int BuildQuestScene(string product, string identifier, string scene, BuildOptions options = BuildOptions.None)
