@@ -296,6 +296,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: PannelloUI
       objectReference: {fileID: 0}
+    - target: {fileID: 3380254910060541958, guid: 02277b5a390d3a24ba7fe6cda6e0903a, type: 3}
+      propertyPath: m_AdditionalShaderChannelsFlag
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 8598180010429846156, guid: 02277b5a390d3a24ba7fe6cda6e0903a, type: 3}
+      propertyPath: m_TextStyleHashCode
+      value: -1183493901
+      objectReference: {fileID: 0}
     - target: {fileID: 9140084555526990517, guid: 02277b5a390d3a24ba7fe6cda6e0903a, type: 3}
       propertyPath: m_Pivot.x
       value: 0.5

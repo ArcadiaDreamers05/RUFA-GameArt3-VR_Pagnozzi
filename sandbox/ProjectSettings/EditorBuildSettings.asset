@@ -6,11 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/Sandbox.unity
-    guid: 80762733b233c704abb313321879d19a
+    path: Assets/Samples/RUFA Core/Lezione 02 - Locomozione/Percorso.unity
+    guid: 77acd9c196a287e409e2ed9749e66440
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
     com.unity.xr.arfoundation.simulation_settings: {fileID: 11400000, guid: 524c63c766f504943abb5b7503995da0, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 81d7ed50d1c73084f9a089049fa31488, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: b5d39fd4f1945304f8120703e69b2832, type: 2}
+    xr.sdk.mock-hmd.settings: {fileID: 11400000, guid: 298089ef0e248054685eb7fb9f73a698, type: 2}
   m_UseUCBPForAssetBundles: 0
