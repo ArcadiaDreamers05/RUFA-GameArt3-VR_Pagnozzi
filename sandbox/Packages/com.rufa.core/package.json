@@ -1,7 +1,7 @@
 {
   "name": "com.rufa.core",
   "displayName": "RUFA Core",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "unity": "6000.3",
   "description": "Dual-target runtime and editor tooling for the Game Art 3 course: spawns a VR rig on Meta Quest or a desktop rig on PC, and configures and builds the project from menu items.",
   "author": {
@@ -23,6 +23,11 @@
       "displayName": "Lezione 03 - Interazioni",
       "description": "Palestra della lezione 3: la Sala delle interazioni da curare e la fuga a stanze.",
       "path": "Samples~/Lezione 03 - Interazioni"
+    },
+    {
+      "displayName": "Lezione 04 - Level design",
+      "description": "Palestra della lezione 4: la Casa storta da curare e il Rifugio da costruire sulla pianta.",
+      "path": "Samples~/Lezione 04 - Level design"
     }
   ]
 }

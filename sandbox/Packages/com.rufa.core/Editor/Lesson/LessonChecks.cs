@@ -62,6 +62,22 @@ namespace Rufa.Editor
                                      && UnityEngine.Object.FindObjectsByType(t, FindObjectsSortMode.None).Any(x => CourseGoal.Above(c, ((Component)x).transform.position)),
             ["ambiente-intatto"] = a => GameObject.Find(a[0]) is GameObject o && o.TryGetComponent(out EnvironmentSnapshot s) && s.Changes().Count == 0,
             ["riuscito"] = a => GameObject.Find(a[0]) is GameObject o && o.TryGetComponent(out CourseGoal g) && g.reached,
+            // The measures of a blockout (LevelChecks), read on the colliders and only out of Play: a cure made in Play is lost when Play stops.
+            ["varco"] = a => !EditorApplication.isPlaying && GameObject.Find(a[0]) is GameObject m && LevelChecks.Width(m.transform) is float w && LevelChecks.Clearance(m.transform) is float h
+                             && Between(w, a[1], a[2]) && Between(h, a[3], a[4]),
+            ["altezza-libera"] = a => !EditorApplication.isPlaying && GameObject.Find(a[0]) is GameObject m && LevelChecks.Clearance(m.transform) is float h && Between(h, a[1], a[2]),
+            ["larghezza"] = a => !EditorApplication.isPlaying && GameObject.Find(a[0]) is GameObject m && LevelChecks.Width(m.transform) is float w && Between(w, a[1], a[2]),
+            ["percorso-liscio"] = a => !EditorApplication.isPlaying && GameObject.Find(a[0]) is GameObject from && GameObject.Find(a[1]) is GameObject to
+                                       && LevelChecks.Roughness(from.transform, to.transform) is float jump && jump <= Number(a[2]) + 0.0001f,
+            ["teleport-sotto"] = a => !EditorApplication.isPlaying && a.All(name => GameObject.Find(name) is GameObject m && LevelChecks.TeleportUnder(m.transform)),
+            ["rivolto-verso"] = a => !EditorApplication.isPlaying && GameObject.Find(a[0]) is GameObject o && GameObject.Find(a[1]) is GameObject t && LevelChecks.Facing(o.transform, t.transform) <= Number(a[2]),
+            ["luce-vicino"] = a => !EditorApplication.isPlaying && GameObject.Find(a[0]) is GameObject o && LevelChecks.LightNear(o.transform, Number(a[1])),
+            ["altezza"] = a => !EditorApplication.isPlaying && GameObject.Find(a[0]) is GameObject o && LevelChecks.Height(o.transform) is float y && Between(y, a[1], a[2]),
+            ["dimensione"] = a => !EditorApplication.isPlaying && GameObject.Find(a[0]) is GameObject o && LevelChecks.Size(o.transform, a[1]) is float s && Between(s, a[2], a[3]),
+            ["file-compilato"] = a => LevelChecks.FileFilled(Path.Combine(LevelChecks.Repository, a[0]), a[1]),
+            // The sky and the fog of the Lighting window: a panorama takes its depth from both
+            ["panorama"] = a => !EditorApplication.isPlaying && RenderSettings.skybox != null && RenderSettings.skybox.name == a[0]
+                                && RenderSettings.fog && RenderSettings.fogMode == FogMode.Linear && RenderSettings.fogEndDistance >= Number(a[1]),
             ["mani-pronte"] = _ => HandsSetup.Ready(),
             ["modalita-mani"] = _ => EditorApplication.isPlaying && XRInputModalityManager.currentInputMode.Value == XRInputModalityManager.InputMode.TrackedHand,
         };
@@ -78,6 +94,8 @@ namespace Rufa.Editor
             ["apri-scena"] = a => OpenSampleScene(a[0], a[1]),
             ["crea-progetto"] = _ => ProjectScene.Create(ProjectScene.Folder),
             ["prepara-mani"] = _ => HandsSetup.Prepare(),
+            ["crea-concept"] = a => EditorUtility.OpenWithDefaultApp(LevelChecks.CreateConcept(a[0])),
+            ["riferimenti-scala"] = _ => LevelChecks.AddScaleReferences(),
         };
 
         public static bool Exists(string id) => Checks.ContainsKey(id) || Actions.ContainsKey(id);

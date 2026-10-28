@@ -10,10 +10,15 @@ namespace Rufa
     /// </summary>
     public sealed class DarkRoom : MonoBehaviour
     {
+        [Tooltip("The ambient light left in the room: 0 is black, and only real lights show what is inside. On an LCD headset a little above 0 reads as dark instead of as a hole.")]
+        [Range(0f, 0.5f)] public float ambient;
+
         void Awake()
         {
+            var light = new SphericalHarmonicsL2();
+            light.AddAmbientLight(new Color(ambient, ambient, ambient));
             var dark = new MaterialPropertyBlock();
-            dark.CopySHCoefficientArraysFrom(new[] { new SphericalHarmonicsL2() });
+            dark.CopySHCoefficientArraysFrom(new[] { light });
             foreach (var r in GetComponentsInChildren<Renderer>(true))
             {
                 r.lightProbeUsage = LightProbeUsage.CustomProvided;
