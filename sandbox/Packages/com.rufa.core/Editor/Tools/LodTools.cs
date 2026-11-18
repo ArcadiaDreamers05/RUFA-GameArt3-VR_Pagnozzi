@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -8,7 +9,8 @@ namespace Rufa.Editor
 {
     /// <summary>
     /// Builds a LODGroup from decimated variants exported next to the original model:
-    /// for a mesh in "tavolo.fbx", the tool looks for "tavolo_LOD1" and "tavolo_LOD2" in the same folder.
+    /// for a mesh in "tavolo.fbx", the tool looks for "tavolo_LOD1" and "tavolo_LOD2" in the same folder. A variant of
+    /// another size is refused, and a second run replaces the levels of the first.
     /// </summary>
     public static class LodTools
     {
@@ -31,21 +33,39 @@ namespace Rufa.Editor
             var baseName = Path.GetFileNameWithoutExtension(path);
             var renderer = go.GetComponent<MeshRenderer>();
 
-            var levels = new List<Renderer[]> { new Renderer[] { renderer } };
+            var variants = new List<Mesh>();
             for (int level = 1; level <= 2; level++)
             {
                 var mesh = FindMesh(folder, $"{baseName}_LOD{level}");
                 if (mesh == null) break;
-                var child = new GameObject($"LOD{level}", typeof(MeshFilter), typeof(MeshRenderer));
-                child.transform.SetParent(go.transform, false);
-                child.GetComponent<MeshFilter>().sharedMesh = mesh;
-                child.GetComponent<MeshRenderer>().sharedMaterials = renderer.sharedMaterials;
-                levels.Add(new Renderer[] { child.GetComponent<MeshRenderer>() });
+                // Exported with Blender's default scaling, a variant arrives a hundred times smaller: the model would vanish
+                // from afar, so the tool stops and says which setting to change.
+                float ratio = mesh.bounds.size.magnitude / filter.sharedMesh.bounds.size.magnitude;
+                if (ratio < 0.8f || ratio > 1.25f)
+                {
+                    Debug.LogWarning($"RUFA: {baseName}_LOD{level} is {ratio:0.###} times the size of {baseName}. Export it again from Blender with Apply Scalings: FBX Units Scale.");
+                    return false;
+                }
+                variants.Add(mesh);
             }
-            if (levels.Count == 1)
+            if (variants.Count == 0)
             {
                 Debug.LogWarning($"RUFA: no mesh named {baseName}_LOD1 next to {path}. Export the decimated variants from Blender first.");
                 return false;
+            }
+
+            // A second run, after a new export, starts again: the levels the tool made before make way for the new ones
+            // (those that come with a prefab stay; the prefab is the place to change them).
+            foreach (var old in go.transform.Cast<Transform>().Where(t => (t.name == "LOD1" || t.name == "LOD2") && !PrefabUtility.IsPartOfPrefabInstance(t)).ToArray())
+                Object.DestroyImmediate(old.gameObject);
+            var levels = new List<Renderer[]> { new Renderer[] { renderer } };
+            for (int i = 0; i < variants.Count; i++)
+            {
+                var child = new GameObject($"LOD{i + 1}", typeof(MeshFilter), typeof(MeshRenderer));
+                child.transform.SetParent(go.transform, false);
+                child.GetComponent<MeshFilter>().sharedMesh = variants[i];
+                child.GetComponent<MeshRenderer>().sharedMaterials = renderer.sharedMaterials;
+                levels.Add(new Renderer[] { child.GetComponent<MeshRenderer>() });
             }
 
             var group = go.GetComponent<LODGroup>();
@@ -58,16 +78,21 @@ namespace Rufa.Editor
             return true;
         }
 
+        // A variant exported from Blender keeps the name of the original mesh inside its file (tavolo inside
+        // tavolo_LOD1.fbx), so the file's name counts first; a mesh with the variant's name also does.
         static Mesh FindMesh(string folder, string name)
         {
-            foreach (var guid in AssetDatabase.FindAssets($"{name} t:Mesh", new[] { folder }))
+            foreach (var guid in AssetDatabase.FindAssets(name, new[] { folder }))
             {
                 var assetPath = AssetDatabase.GUIDToAssetPath(guid);
-                foreach (var asset in AssetDatabase.LoadAllAssetsAtPath(assetPath))
-                    if (asset is Mesh mesh && (mesh.name == name || Path.GetFileNameWithoutExtension(assetPath) == name))
-                        return mesh;
+                var meshes = AssetDatabase.LoadAllAssetsAtPath(assetPath).OfType<Mesh>();
+                var mesh = Same(Path.GetFileNameWithoutExtension(assetPath), name) ? meshes.FirstOrDefault() : meshes.FirstOrDefault(m => Same(m.name, name));
+                if (mesh != null) return mesh;
             }
             return null;
         }
+
+        // Windows does not tell tavolo_lod1.fbx from tavolo_LOD1.fbx, and neither does the search.
+        static bool Same(string a, string b) => string.Equals(a, b, System.StringComparison.OrdinalIgnoreCase);
     }
 }

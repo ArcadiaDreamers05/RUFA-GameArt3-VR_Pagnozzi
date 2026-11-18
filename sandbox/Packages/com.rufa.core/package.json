@@ -1,7 +1,7 @@
 {
   "name": "com.rufa.core",
   "displayName": "RUFA Core",
-  "version": "0.5.0",
+  "version": "0.8.0",
   "unity": "6000.3",
   "description": "Dual-target runtime and editor tooling for the Game Art 3 course: spawns a VR rig on Meta Quest or a desktop rig on PC, and configures and builds the project from menu items.",
   "author": {
@@ -28,6 +28,21 @@
       "displayName": "Lezione 04 - Level design",
       "description": "Palestra della lezione 4: la Casa storta da curare e il Rifugio da costruire sulla pianta.",
       "path": "Samples~/Lezione 04 - Level design"
+    },
+    {
+      "displayName": "Lezione 05 - Profiling",
+      "description": "Palestra della lezione 5: Il colpevole, stanze in cui un oggetto costa troppo, da trovare con gli strumenti di misura.",
+      "path": "Samples~/Lezione 05 - Profiling"
+    },
+    {
+      "displayName": "Lezione 06 - Geometria",
+      "description": "Palestra della lezione 6: il museo, col salone da curare insieme e tre sale da curare da soli senza cambiarne l'aspetto.",
+      "path": "Samples~/Lezione 06 - Geometria"
+    },
+    {
+      "displayName": "Lezione 07 - Draw call",
+      "description": "Palestra della lezione 7: il mercato coperto, col banco della frutta da curare insieme, tre banchi da curare da soli e le cassette del laboratorio.",
+      "path": "Samples~/Lezione 07 - Draw call"
     }
   ]
 }

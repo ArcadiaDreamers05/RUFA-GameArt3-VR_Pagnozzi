@@ -64,7 +64,7 @@ Lo script `Hand Gesture` del corso riconosce una gesture della mano, tenuta per 
 Una gesture si prova col visore: con la scena aperta, **RUFA ▸ Build ▸ Scena aperta (APK)** ne fa un'app a parte, da installare con `adb install -r Builds/Quest/RUFA_Scena.apk`. Le mani le provi nella Sala e nella fuga: il rig del tuo progetto ha solo i controller.
 
 ## I mattoncini
-In `Assets/RUFA/Prefabs/` ci sono pezzi già montati, con gli stessi componenti di oggi. Nella scena `Sandbox`, sotto `Mini-esempi`, li trovi collegati a qualcosa che si vede: seleziona un mattoncino e guarda il suo evento nell'Inspector. Se ti fanno comodo per il progetto, usane una copia in `Assets/Progetto`: gli originali li usa anche il demo.
+In `Assets/RUFA/Prefabs/` ci sono pezzi già montati, con gli stessi componenti di oggi. Nella scena `Sandbox`, sotto `Mini-esempi`, li trovi collegati a qualcosa che si vede: seleziona un mattoncino e guarda il suo evento nell'Inspector. Se sotto `Mini-esempi` manca la fila dei meccanismi, dalla leva al tastierino, la tua scena `Sandbox` è ancora quella della lezione 1: aprila, lancia **RUFA ▸ Setup ▸ 4 - Aggiungi mini-esempi alla scena** e salva. Se ti fanno comodo per il progetto, usane una copia in `Assets/Progetto`: gli originali li usa anche il demo.
 
 | Mattoncino | Cosa c'è dentro | Evento | Come si usa |
 |---|---|---|---|

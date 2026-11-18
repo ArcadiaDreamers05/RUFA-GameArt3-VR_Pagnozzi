@@ -67,14 +67,14 @@ Se lavori su due PC, prima di cominciare su uno prendi quello che hai salvato su
 ## Inizio e fine lezione
 Due comandi, dalla cartella della tua copia (`rufa-vr`), sempre con **Unity chiuso**:
 
-- **Inizio lezione:** `git aggiorna`. Prende dal corso il nucleo, le dispense, la cartella del demo (`Assets/Demo`) e gli Starter Assets di XR Interaction Toolkit, e li salva sul tuo repository. La cartella del demo torna identica a quella del docente, anche se hai saltato una lezione. Il tuo progetto non lo tocca.
+- **Inizio lezione:** `git aggiorna`. Prende dal corso il nucleo, le dispense, la cartella del demo (`Assets/Demo`), gli Starter Assets di XR Interaction Toolkit e il `.gitignore`, cioè l'elenco dei file che restano fuori da git, e li salva sul tuo repository. La cartella del demo torna identica a quella del docente, anche se hai saltato una lezione. Porta anche i file nuovi del corso che non hai mai avuto, come i mattoncini aggiunti dopo la lezione 1. Il tuo progetto non lo tocca.
 - **Fine lezione:** in Unity Ctrl+S e **File ▸ Save Project**, poi chiudi Unity e lancia `git salva "Lezione 03"`. Salva tutto, consegna in `Consegne/L03/` compresa, e lo manda sul tuo repository.
 
 Perché gli aggiornamenti non rompano mai niente:
 - gli Starter Assets (`Assets/Samples/XR Interaction Toolkit`) non si modificano: a ogni `git aggiorna` tornano quelli del corso. Quello che vuoi cambiare lo cambi nelle variant, come il tuo `XR Origin (progetto)`;
 - il tuo lavoro va in `Assets/Progetto/` e nelle tue scene. Nella cartella `Assets/Demo` lavori solo durante le dimostrazioni: a ogni `git aggiorna` torna quella del docente, e la tua versione resta nella storia di git;
-- `sandbox/Packages/com.rufa.core/` e `materiali/` non si modificano: li aggiorna il corso. Se li hai toccati per sbaglio, `git aggiorna` li rimette com'erano;
-- il demo usa anche file del tuo progetto, che `git aggiorna` non tocca: i prefab mattoncino di `Assets/RUFA/Prefabs` e le impostazioni URP di `Assets/Settings`. Se li modifichi, cambiano anche nel demo. Per le tue versioni dei mattoncini fai una copia, o una Prefab Variant, in `Assets/Progetto`;
+- `sandbox/Packages/com.rufa.core/`, `materiali/` e il `.gitignore` non si modificano: li aggiorna il corso. Se li hai toccati per sbaglio, `git aggiorna` li rimette com'erano;
+- il demo usa anche file del tuo progetto: i prefab mattoncino di `Assets/RUFA/Prefabs` e le impostazioni URP di `Assets/Settings`. `git aggiorna` porta i mattoncini nuovi, ma quelli che hai già non li tocca, nemmeno se li hai spostati o cancellati. Se li modifichi, cambiano anche nel demo. Per le tue versioni dei mattoncini fai una copia, o una Prefab Variant, in `Assets/Progetto`;
 - per usare nel tuo progetto un modello del demo, duplicalo (Ctrl+D) e sposta la copia in `Assets/Progetto`. Se sposti l'originale, `git aggiorna` lo rimette al suo posto e Unity si ritrova due file con lo stesso GUID;
 - non salvare scene o file tuoi dentro `Assets/Demo`: `git aggiorna` li cancella, e lo scrive (`Removing …`).
 

@@ -8,9 +8,9 @@ Ogni consegna va nel tuo repository, cartella `Consegne/Lxx/`, entro la fine del
 | 2 | Locomozione e comfort: verifica a percorso e prima scena del progetto | Nessun file da aggiungere: il lavoro salvato a Unity chiuso con `git salva "Lezione 02"` |
 | 3 | Set di interazioni funzionanti: verifica a stanze e prime interazioni nel progetto | Nessun file da aggiungere: il lavoro salvato a Unity chiuso con `git salva "Lezione 03"` |
 | 4 | **Pitch e blockout approvato** | Il concept (`concept.md`, dal pulsante del tutorial) e la pianta (`pianta.png`); il blockout resta nella scena `Progetto`, percorribile, e lo guarda il docente |
-| 5 | Report di profiling del blockout | Report (una pagina) + CSV del benchmark "prima" |
-| 6 | Asset con LOD e culling | Screenshot dei LODGroup e dell'occlusion; misura prima/dopo |
-| 7 | Draw call ridotte e misurate | Tabella Draw Calls / SetPass prima/dopo |
+| 5 | Report di profiling del blockout | Il report (`Consegne/L05/report.md`, dal pulsante del tutorial), con le condizioni della misura, chi sfora e come lo sai, i due test di Meta, Project Auditor e Memory Profiler; accanto, le misure del visore: i CSV del benchmark e, in `OVR Metrics/`, quelli di OVR Metrics |
+| 6 | La geometria nel museo, nel laboratorio e nel proprio blockout: LOD, culling e le opere preparate in Blender | Il file delle misure (`Consegne/L06/misure.md`, dal pulsante del tutorial) e le foto del prima e del dopo: le quattro parti del museo, le nicchie del laboratorio e la `Camera foto` del progetto |
+| 7 | Le draw call nel mercato, nel laboratorio e nel proprio blockout: materiali condivisi, uno shader, statici, meno vetri e l'atlas fatto in Blender | Il file delle misure (`Consegne/L07/misure.md`, dal pulsante del tutorial) e le foto del prima e del dopo: la frutta, le spezie, la vetrina e il bar del mercato, le cassette del laboratorio e la `Camera foto` del progetto. La cassetta riesportata da Blender, `cassetta_mista.fbx` con le due immagini dell'atlas, si salva con `git salva "Lezione 07"` a fine lezione; al `git aggiorna` della lezione dopo la cartella `Assets/Demo/Models/Mercato` torna come nel corso |
 | 8 | Bake completo | Screenshot della Lighting window; misura GPU ms |
 | 9 | Audit e ricompressione delle texture | Tabella dell'audit prima/dopo; dimensione APK |
 | 10 | Feature di rendering attivate e misurate | Una riga per feature con frame time prima/dopo |

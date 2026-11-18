@@ -25,6 +25,8 @@ namespace Rufa.Editor
             ["sample-importato"] = a => ImportedFolder(a[0]) != null,
             ["scena-aperta"] = a => EditorSceneManager.GetActiveScene().name == a[0],
             ["simulatore-acceso"] = _ => EditorUserSettings.GetConfigValue(RigBootstrap.SimulatorSetting) == "1",
+            ["simulatore-spento"] = _ => EditorUserSettings.GetConfigValue(RigBootstrap.SimulatorSetting) != "1",
+            ["asset-esiste"] = a => AssetDatabase.LoadMainAssetAtPath(a[0]) != null,
             ["in-play"] = _ => EditorApplication.isPlaying,
             ["fuori-play"] = _ => !EditorApplication.isPlaying,
             ["selezionato"] = a => Selection.activeGameObject != null && a.Contains(Selection.activeGameObject.name),
@@ -75,6 +77,31 @@ namespace Rufa.Editor
             ["altezza"] = a => !EditorApplication.isPlaying && GameObject.Find(a[0]) is GameObject o && LevelChecks.Height(o.transform) is float y && Between(y, a[1], a[2]),
             ["dimensione"] = a => !EditorApplication.isPlaying && GameObject.Find(a[0]) is GameObject o && LevelChecks.Size(o.transform, a[1]) is float s && Between(s, a[2], a[3]),
             ["file-compilato"] = a => LevelChecks.FileFilled(Path.Combine(LevelChecks.Repository, a[0]), a[1]),
+            ["file-esiste"] = ProfilingChecks.FilesExist,
+            ["vsync-spento"] = _ => ProfilingChecks.GameViewVsyncOff(),
+            ["pacchetto"] = a => a.All(name => UnityEditor.PackageManager.PackageInfo.FindForPackageName(name) != null),
+            // In Play only: out of Play the change would stay in the demo, and the next page wants the shadows back.
+            ["luci-senza-ombre"] = a => EditorApplication.isPlaying && ProfilingChecks.ShadowlessLights(a[0]),
+            // Out of Play only, like the measures: a culprit switched off in Play comes back when Play stops.
+            ["colpevole"] = a => !EditorApplication.isPlaying && ProfilingChecks.CulpritOff(a[0], a[1]),
+            // A room of the museum cured without switching off, moving or deleting anything in it.
+            ["lod-su"] = a => !EditorApplication.isPlaying && GeometryChecks.CuredWithLod(a[0], a[1]),
+            ["occlusion-su"] = a => !EditorApplication.isPlaying && GeometryChecks.CuredWithOcclusion(a[0], a[1]),
+            // The lab: the back nobody sees cut away in the 3D program, Unity's own LODs on import, the hard edges smoothed.
+            ["retro-tolto"] = a => !EditorApplication.isPlaying && GeometryChecks.BackRemoved(a[0], a[1], (int)Number(a[2]), (int)Number(a[3]), Number(a[4])),
+            ["mesh-lod"] = a => GeometryChecks.HasMeshLods(a[0]),
+            ["vertici-al-massimo"] = a => !EditorApplication.isPlaying && GeometryChecks.FewVertices(a[0], a[1], (int)Number(a[2])),
+            // The market: a stall cured without switching off, moving or deleting its goods; the crate drawn with its atlas.
+            ["srp-batcher-acceso"] = _ => DrawCallChecks.SrpBatcherOn(),
+            // The experiment's first page: a page done together counts once, so switching off and on are two pages.
+            ["srp-batcher-spento"] = _ => !DrawCallChecks.SrpBatcherOn(),
+            // On Android the editor draws with the Mobile quality level: other numbers, and the PC asset is not the one in use.
+            ["piattaforma-pc"] = _ => BuildPipeline.GetBuildTargetGroup(EditorUserBuildSettings.activeBuildTarget) == BuildTargetGroup.Standalone,
+            ["una-variante"] = a => !EditorApplication.isPlaying && DrawCallChecks.OneVariant(a[0], a[1]),
+            ["materiali-al-massimo"] = a => !EditorApplication.isPlaying && DrawCallChecks.MaterialsAtMost(a[0], (int)Number(a[1])),
+            ["statici"] = a => !EditorApplication.isPlaying && DrawCallChecks.AllStatic(a[0]),
+            ["trasparenti-fra"] = a => !EditorApplication.isPlaying && DrawCallChecks.TransparentsBetween(a[0], (int)Number(a[1]), (int)Number(a[2]), a[3]),
+            ["un-materiale"] = a => !EditorApplication.isPlaying && DrawCallChecks.OneMaterial(a[0]),
             // The sky and the fog of the Lighting window: a panorama takes its depth from both
             ["panorama"] = a => !EditorApplication.isPlaying && RenderSettings.skybox != null && RenderSettings.skybox.name == a[0]
                                 && RenderSettings.fog && RenderSettings.fogMode == FogMode.Linear && RenderSettings.fogEndDistance >= Number(a[1]),
@@ -86,7 +113,7 @@ namespace Rufa.Editor
         public const string GazeFilterField = "m_DestinationEvaluationSettings.m_ConstantValue.m_DestinationFilterObject";
 
         /// <summary>The checks that can pass only in Play: in a list chapter they stay done once they pass.</summary>
-        public static readonly HashSet<string> PlayOnly = new HashSet<string> { "in-play", "sopra-oggetto", "sopra-area-filtrata", "riuscito", "su-anchor", "stato", "afferrato", "modalita-mani" };
+        public static readonly HashSet<string> PlayOnly = new HashSet<string> { "in-play", "sopra-oggetto", "sopra-area-filtrata", "riuscito", "su-anchor", "stato", "afferrato", "modalita-mani", "luci-senza-ombre" };
 
         static readonly Dictionary<string, Action<string[]>> Actions = new Dictionary<string, Action<string[]>>
         {
@@ -96,6 +123,14 @@ namespace Rufa.Editor
             ["prepara-mani"] = _ => HandsSetup.Prepare(),
             ["crea-concept"] = a => EditorUtility.OpenWithDefaultApp(LevelChecks.CreateConcept(a[0])),
             ["riferimenti-scala"] = _ => LevelChecks.AddScaleReferences(),
+            ["apri-scena-progetto"] = a => OpenProjectScene(a[0]),
+            // Pressed again, it must not undo the stations the student has moved: Create would make them from scratch.
+            ["stazioni-benchmark"] = _ => { if (GameObject.Find(BenchmarkStations.RootName) == null) BenchmarkStations.CreateSandbox(); },
+            ["apri-cartella-benchmark"] = _ => { Directory.CreateDirectory(Application.persistentDataPath); EditorUtility.OpenWithDefaultApp(Application.persistentDataPath); },
+            ["scarica-misure"] = a => ProfilingChecks.PullMeasures(a[0], ProfilingChecks.Adb),
+            ["crea-report"] = a => EditorUtility.OpenWithDefaultApp(ProfilingChecks.CreateReport(a[0])),
+            ["foto-camera"] = a => GeometryChecks.Photo(a[0], a[1]),
+            ["crea-misure"] = a => EditorUtility.OpenWithDefaultApp(GeometryChecks.CreateMeasures(a[0])),
         };
 
         public static bool Exists(string id) => Checks.ContainsKey(id) || Actions.ContainsKey(id);
@@ -227,6 +262,13 @@ namespace Rufa.Editor
                 Debug.LogError($"RUFA: '{scene}' is not in your copy of '{displayName}'. Delete the folder {ImportedFolder(displayName)} and press the button again.");
                 return;
             }
+            if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) EditorSceneManager.OpenScene(path);
+        }
+
+        // A scene of the project, like the demo's: asks first whether to save the open scene if it has changes.
+        static void OpenProjectScene(string path)
+        {
+            if (AssetDatabase.LoadAssetAtPath<SceneAsset>(path) == null) { Debug.LogError($"RUFA: no scene at {path}. Close Unity and run git aggiorna."); return; }
             if (EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) EditorSceneManager.OpenScene(path);
         }
     }

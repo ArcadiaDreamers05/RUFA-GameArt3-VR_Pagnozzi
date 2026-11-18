@@ -95,12 +95,15 @@ namespace Rufa.Editor
         public const string Placeholder = "«da scrivere»";
 
         /// <summary>Writes the concept template where there is none; the student's text is never overwritten. Returns the full path.</summary>
-        public static string CreateConcept(string path)
+        public static string CreateConcept(string path) => FromTemplate(path, ConceptTemplate);
+
+        /// <summary>Writes a template where there is no file yet, never over the student's text. Returns the full path.</summary>
+        internal static string FromTemplate(string path, string template)
         {
             var full = Path.Combine(Repository, path);   // an absolute path stays as it is
             if (File.Exists(full)) return full;
             Directory.CreateDirectory(Path.GetDirectoryName(full));
-            File.WriteAllText(full, ConceptTemplate);
+            File.WriteAllText(full, template);
             return full;
         }
 

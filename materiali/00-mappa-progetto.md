@@ -9,7 +9,7 @@ Cosa c'è nel progetto, cosa succede quando premi Play, dove si cambiano le cose
 | `sandbox/` | Il progetto Unity: lo apri da Unity Hub e diventa il tuo progetto d'esame |
 | `sandbox/Assets/Scenes/Sandbox.unity` | La scena di partenza |
 | `sandbox/Assets/Demo/` | La casa del docente, con la scena `Assets/Demo/Scenes/Demo.unity`: la curi insieme a lui durante le dimostrazioni. A ogni `git aggiorna` torna uguale alla sua |
-| `sandbox/Assets/RUFA/Prefabs/` | Gli otto prefab mattoncino: chiave, serratura, porta, pulsante, trigger narrativo, pannello UI, audio spaziale, oggetto afferrabile. Li usa anche la scena del demo: per le tue versioni fai una copia, o una Prefab Variant, in `Assets/Progetto` |
+| `sandbox/Assets/RUFA/Prefabs/` | I prefab mattoncino: chiave, serratura, porta, pulsante, trigger narrativo, pannello UI, audio spaziale, oggetto afferrabile e, dalla lezione 3, leva, mobile col cassetto, manovella, manopola, slider, interruttore, tastierino. Li usa anche la scena del demo: per le tue versioni fai una copia, o una Prefab Variant, in `Assets/Progetto` |
 | `sandbox/Assets/Samples/XR Interaction Toolkit/3.6.1/Starter Assets/` | Il rig VR di XR Interaction Toolkit, con la locomozione |
 | `sandbox/Packages/com.rufa.core/` | Il nucleo del corso: il doppio target VR/PC, gli script dei mattoncini e il menu RUFA. **Non va modificato**: arrivano da qui gli aggiornamenti del docente |
 | `materiali/` | Le dispense |

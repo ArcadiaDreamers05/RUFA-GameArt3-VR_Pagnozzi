@@ -129,7 +129,13 @@ namespace Rufa
                 yield return null;
                 frames.Add(Time.unscaledDeltaTime * 1000f);
                 double gpuMs = GpuTime.LastFrameMs(); // also captures this frame's timings for the CPU value below
-                if (FrameTimingManager.GetLatestTimings(1, timing) > 0 && timing[0].cpuFrameTime > 0) cpu.Add(timing[0].cpuFrameTime);
+                if (FrameTimingManager.GetLatestTimings(1, timing) > 0)
+                {
+                    // The CPU's time: the busier of the main and the render thread. cpuFrameTime would be the whole frame, waits
+                    // included; over budget, the longer of this and the GPU time is the one that holds the frame back.
+                    double work = Math.Max(timing[0].cpuMainThreadFrameTime, timing[0].cpuRenderThreadFrameTime);
+                    if (work > 0) cpu.Add(work);
+                }
                 if (gpuMs > 0) gpu.Add(gpuMs);
             }
         }

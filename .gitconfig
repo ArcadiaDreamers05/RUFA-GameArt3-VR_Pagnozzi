@@ -1,8 +1,10 @@
 # Two shortcuts for the course, enabled once with: git config include.path ../.gitconfig
-#   git aggiorna   start of the lesson: core, handouts, the demo folder and the XRI Starter Assets become the course's again
+#   git aggiorna   start of the lesson: core, handouts, the demo folder, the XRI Starter Assets and the .gitignore become the course's again,
+#                  and the course's files you never had arrive, like new building blocks; what you have, moved or deleted stays so
 #   git salva "Lezione 03"   end of the lesson: commit everything and push it to your repository
 # Both commit only when there is something to commit and always push, so after a failed push the next run sends it.
 # git lfs fetch corso: the course's LFS files come from the course even with Git LFS versions without lfs.remote.searchall.
+# The course's files missing from your index are few: each comes unless it is on disk or your history ever had it.
 [alias]
-	aggiorna = "!f() { git fetch corso && git lfs fetch corso corso/main && git restore --source=corso/main --staged --worktree -- sandbox/Packages/com.rufa.core sandbox/Assets/Demo sandbox/Assets/Demo.meta \"sandbox/Assets/Samples/XR Interaction Toolkit/3.6.1/Starter Assets\" materiali README.md .gitconfig && git clean -fd -- sandbox/Assets/Demo && { git diff --cached --quiet || git commit -qm 'Aggiornamento dal corso'; } && git push -q; }; f"
+	aggiorna = "!f() { git fetch corso && git lfs fetch corso corso/main && git restore --source=corso/main --staged --worktree -- sandbox/Packages/com.rufa.core sandbox/Assets/Demo sandbox/Assets/Demo.meta \"sandbox/Assets/Samples/XR Interaction Toolkit/3.6.1/Starter Assets\" materiali README.md .gitconfig .gitignore && git clean -fd -- sandbox/Assets/Demo && git -c core.quotepath=off diff --cached --name-only --no-renames --diff-filter=D corso/main -- sandbox | while IFS= read -r p; do [ -e \"$p\" ] || [ -n \"$(git --literal-pathspecs log -1 --format=%h -- \"$p\")\" ] || git --literal-pathspecs restore --source=corso/main --staged --worktree -- \"$p\" || exit 1; done && { git diff --cached --quiet || git commit -qm 'Aggiornamento dal corso'; } && git push -q; }; f"
 	salva = "!f() { git add -A && { git diff --cached --quiet || git commit -qm \"${1:-Fine lezione}\"; } && git push -q; }; f"
